@@ -113,49 +113,50 @@ function App() {
           margin: "0 auto"
         }}
         ref={stageRef}
-        width={10000}
-        height={10000}
+        width={1000}
+        height={1000}
         x={position.x}
         y={position.y}
         onWheel={(e) => {
           e.evt.preventDefault();
           const stage = e.currentTarget.getStage()
-          
+
           // how to scale? Zoom in? Or zoom out?
           let direction = e.evt.deltaY > 0 ? 1 : -1;
-          
+
           // when we zoom on trackpad, e.evt.ctrlKey is true
           // in that case lets revert direction
           if (e.evt.ctrlKey) {
             direction = -direction;
           }
-          
+
           const newScale = !(direction > 0) ? scale * scaleBy : scale / scaleBy;
           const nn = maxScale < newScale ? maxScale : newScale < minScale ? minScale : newScale
           setScale(nn);
-          if (!stage || !e.currentTarget.x || !e.currentTarget.y) {
+          console.log("here", stage.getPointerPosition());
+          if (!stage) {
             return
           }
           const oldScale = stage.scaleX()
-          console.log();
 
 
-          const pointer = {
-            x: stage.getPointerPosition()?.x() ?? 0,
-            y: stage.getPointerPosition()?.y() ?? 0,
-          };
 
 
           const mousePointTo = {
-            x: (pointer.x() - stage.x() ?? 0) / oldScale,
-            y: (pointer.y() - stage.y() ?? 0) / oldScale,
+            x: stage.x() / oldScale - stage.x() / oldScale,
+            y: stage.y() / oldScale - stage.y() / oldScale
           };
 
           const newPos = {
-            x: pointer.x() - mousePointTo.x * newScale,
-            y: pointer.y() - mousePointTo.y * newScale,
+            x: -(mousePointTo.x - stage.getPointerPosition().x  / newScale) / 16 * newScale,
+            y: -(mousePointTo.y - stage.getPointerPosition().y  / newScale) / 9 * newScale
           };
-          setPosition(newPos);
+          console.log(newPos);
+          const pp = {
+            x: (direction > 0) ? newPos.x + (newScale * cellPX) : newPos.x + (newScale * cellPX) ,
+            x: (direction > 0) ? newPos.y - (newScale * cellPX) : newPos.y - (newScale * cellPX) ,
+          }
+          setPosition(pp);
         }}
         onClick={(e) => {
           console.log(e.target.attrs);
